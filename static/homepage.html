@@ -1,0 +1,180 @@
+<html>
+  <head>
+    <title>Minecraft Skins!</title>
+    <style>
+        body{
+            background-color: #000000;
+        }
+        .lol{
+            max-width: 700px;
+            margin: auto;
+        }
+        *{
+            color: #FFFFFF;
+        }
+        input{
+            background-color: #000000;
+        }
+        .logoutInput{
+            position:relative;
+            left:450px;
+            top:-50px;
+            height:0px;
+            width: 200px;
+        }
+        ::-webkit-file-upload-button {
+            background: black;
+            color: white;
+        }
+        .skin_form{
+            position:relative;
+            width: 300px;
+            height: 0px;
+            left: 390px;
+            bottom: 500px;
+        }
+        #skin_container{
+            width: 350px;
+            background-color: #212121;
+        }
+        .rule{
+            position:relative;
+            bottom: 4px;
+            left: 0px;
+            width: 280px;
+        }
+    </style>
+  </head>
+  <body>
+  <div class="lol">
+  <h2>Current Skin</h2>
+  <div class="logoutInput">
+  <span>Welcome, [[USERNAME]]</span>
+  <input type="button" value="Logout" onclick='var cookies = document.cookie.split(";");for (var i = 0; i < cookies.length; i++) {var cookie = cookies[i];var eqPos = cookie.indexOf("=");var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";}location.reload();'/>
+  </div>
+    <div id="skin_container"></div>
+    
+	<script type="text/javascript" src="static/three.min.js"></script>
+
+	<script type="text/javascript" src="static/skinview3d.min.js"></script>
+
+	<script>
+	
+        var skinViewer, control = {};
+        
+        onload = InitSkinViewer();
+        
+		function walk_toggle(){
+            if (!walking){
+                if (running){run.remove();}
+                walk = skinViewer.animation.add(skinview3d.WalkingAnimation);
+                walk.speed = 1.5;
+                walking = true;
+                running = false;
+            }
+            else{
+                if (walking){walk.remove();}
+                run = skinViewer.animation.add(skinview3d.RunningAnimation);
+                run.speed = 1;
+                walking = false;
+                running = true;
+            }
+		}
+		
+		function rotate_toggle(){
+            if (!rotating){
+                rotate = skinViewer.animation.add(skinview3d.RotatingAnimation);
+                rotate.speed = 1;
+                rotating = true;
+            }else{
+                rotate.remove();
+                rotating = false;
+            }
+		}
+		
+		function InitSkinViewer(){
+                if (skinViewer instanceof skinview3d.SkinViewer) {
+                    skinViewer.dispose();
+                    control = undefined;
+                }
+                skinViewer = new skinview3d.SkinViewer({
+                domElement: document.getElementById("skin_container"),
+                width: 350,
+                height: 450,
+                skinUrl: "[[SKINURL]]",
+                capeUrl: "[[CAPEURL]]"
+            });
+            // By default, the skin model is automatically detected. You can turn it off in this way:
+            // skinViewer.detectModel = false;
+            // skinViewer.playerObject.skin.slim = true;
+            control = new skinview3d.createOrbitControls(skinViewer);
+            skinViewer.animation = new skinview3d.CompositeAnimation();
+            
+            walking = false;
+            running = false;
+            rotating = false;
+		}
+	</script>
+	
+	<div id="control_panel">
+	<input type="button" value="Toggle Walk/Run" onclick="walk_toggle()"/>
+	<input type="button" value="Toggle Rotate" onclick="rotate_toggle()"/>
+	<input type="button" value="Reset" onclick="InitSkinViewer()"/>
+	</div>
+	<div class="skin_form">
+    <h2>Customize Skin / Cape</h2>
+  <form class="loginParent" method="post" enctype="multipart/form-data" action="upload.php" width="300px">
+		
+		<div class="login" width="300px">
+            <div class="type" width="300px">
+                <input type="radio" name="texturetype" value="Model" checked="checked"/> Skin Model
+                <input type="radio" name="texturetype" value="Cape" /> Cape
+            </div>
+            <br>
+			<div class="loginName" width="300px">
+				<span class="loginNameText">
+					Texture:
+				</span><br>
+				<input type="file" class="loginNameInput" name="skin"/>
+			</div>
+		</div>
+		<br>
+		<div class="modelTypeSelector" width="300px">
+		<span class="skinTypeText">Skin Type (Not required for Cape): </span><br>
+            <input type="radio" name="modeltype" value="D" checked="checked"/> Default
+            <input type="radio" name="modeltype" value="S"/> Slim
+		</div>
+		<br>
+		<div class="submitButtonParent" width="300px">
+			<input type="submit" class="submitInput" name="task" value="Upload"/>
+		</div>
+		</form>
+		<hr align="left" class="rule">
+        <form action="upload.php" method="post">
+            <input type="submit" name="task" value="Remove Skin" />
+            <input type="submit" name="task" value="Remove Cape" />
+        </form>
+        <hr align="left" class="rule">
+        <span><b>Change Password</b></span>
+        <form action="changepw.php" method="post">
+            [[PW-STATUS]]
+            <table>
+            <tr>
+            <td>
+            <span>Old Password</span>
+            </td>
+            <td>
+            <input type="password" name="oldPassword"/>
+            </td></tr>
+            <tr><td><span>New Password</span></td>
+            <td>
+            <input type="password" name="newPassword"/>
+            </td></tr></table>
+            <br>
+            <input type="submit" value="Change Password" />
+        </form>
+	</div>
+	
+  </div>
+  </body>
+</html>
