@@ -14,6 +14,8 @@ if (strpos($target, '.json') !== false){
     
     $SQL_cmd = 'SELECT UserName, ModelID, CapeID, ModelType FROM Users WHERE UserName = "'.$requestusr.'";';
     
+    header('Access-Control-Allow-Origin: *');
+
     $sql_res = mysqli_query($SQL_conn, $SQL_cmd);
     
     if (mysqli_num_rows($sql_res) == 1){
@@ -53,7 +55,8 @@ if (strpos($target, '.json') !== false){
 }
 else if (strpos($target, '/textures/') !== false){
     
-    
+    header('Access-Control-Allow-Origin: *');
+
     $requestid = substr($target, strpos($target, '/textures/') + 10);
     
     if ($requestid === ""){
@@ -108,7 +111,7 @@ else if ($target == "NONE"){
             die("Connection failed: " . mysqli_connect_error());
         }
         
-        $username_sql = 'SELECT CurrentLoginToken, ModelID, CapeID FROM Users WHERE UserName = "'.$username.'";';
+        $username_sql = 'SELECT CurrentLoginToken, ModelID, CapeID, UserName, ModelType FROM Users WHERE UserName = "'.$username.'";';
         $username_res = mysqli_query($SQL_conn, $username_sql);
         
         if (mysqli_num_rows($username_res) == 1){
@@ -121,15 +124,17 @@ else if ($target == "NONE"){
                 #User successfully verified!
                 $skinurl = "?target=/textures/".$row["ModelID"];
                 $capeurl = "?target=/textures/".$row["CapeID"];
+                $username = $row["UserName"];
+                $type = $row["ModelType"] == "S" ? "slim" : "default";
                 
                 if (isset($_COOKIE["change_fail"])){
-                    echo str_replace("[[PW-STATUS]]","Incorrect Old Password",str_replace("[[USERNAME]]", $username, str_replace("[[CAPEURL]]",$capeurl,str_replace("[[SKINURL]]",$skinurl,file_get_contents("static/homepage.html")))));
+                    echo str_replace("[[TYPE]]", $type, str_replace("[[PW-STATUS]]","Incorrect Old Password",str_replace("[[USERNAME]]", $username, str_replace("[[CAPEURL]]",$capeurl,str_replace("[[SKINURL]]",$skinurl,file_get_contents("static/homepage.html"))))));
                     echo '<script type="text/javascript">document.cookie = "change_fail=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";</script>';
                 }else if (isset($_COOKIE["change_success"])){
-                    echo str_replace("[[PW-STATUS]]","Password Successfully Changed!",str_replace("[[USERNAME]]", $username, str_replace("[[CAPEURL]]",$capeurl,str_replace("[[SKINURL]]",$skinurl,file_get_contents("static/homepage.html")))));
+                    echo str_replace("[[TYPE]]", $type, str_replace("[[PW-STATUS]]","Password Successfully Changed!",str_replace("[[USERNAME]]", $username, str_replace("[[CAPEURL]]",$capeurl,str_replace("[[SKINURL]]",$skinurl,file_get_contents("static/homepage.html"))))));
                     echo '<script type="text/javascript">document.cookie = "change_success=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";</script>';
                 }else{
-                    echo str_replace("[[PW-STATUS]]","<br>",str_replace("[[USERNAME]]", $username, str_replace("[[CAPEURL]]",$capeurl,str_replace("[[SKINURL]]",$skinurl,file_get_contents("static/homepage.html")))));
+                    echo str_replace("[[TYPE]]", $type, str_replace("[[PW-STATUS]]","<br>",str_replace("[[USERNAME]]", $username, str_replace("[[CAPEURL]]",$capeurl,str_replace("[[SKINURL]]",$skinurl,file_get_contents("static/homepage.html"))))));
                 }
             }
             else {

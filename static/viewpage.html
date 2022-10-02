@@ -1,0 +1,104 @@
+<html>
+  <head>
+    <title>Minecraft Skins!</title>
+    <style>
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('/static/minecraft.woff2') format('woff2');
+        }
+
+        body{
+            background-color: #000000;
+            text-align: center;
+        }
+        *{
+            color: #FFFFFF;
+        }
+        input{
+            background-color: #000000;
+        }
+        #skin_container{
+            width: 350px;
+            background-color: #212121;
+        }
+    </style>
+  </head>
+  <body>
+    <canvas id="skin_container"></canvas>
+	<script src="/static/skinview3d.bundle.js"></script>
+	<script>
+	
+        var skinViewer = {};
+        
+        onload = InitSkinViewer();
+        
+		function walk_toggle(){
+            // Walk -> Run -> Fly -> Walk -> ...
+
+            if (walking){
+                skinViewer.animation = new skinview3d.RunningAnimation();
+                walking = false;
+                running = true;
+            }
+            else if (running){
+                skinViewer.animation = new skinview3d.FlyingAnimation();
+                running = false;
+                flying = true;
+            } else {
+                skinViewer.animation = new skinview3d.WalkingAnimation();
+                flying = false;
+                walking = true;
+            }
+		}
+		
+		function rotate_toggle(){
+            if (!rotating){
+                skinViewer.autoRotate = true;
+                rotating = true;
+            }else{
+                skinViewer.autoRotate = false;
+                rotating = false;
+            }
+		}
+
+        function elytra_toggle(){
+            if (!elytra) {
+                skinViewer.playerObject.backEquipment = "elytra";
+                elytra = true;
+            } else {
+                skinViewer.playerObject.backEquipment = "cape";
+                elytra = false;
+            }
+        }
+		
+		function InitSkinViewer(){
+                if (skinViewer instanceof skinview3d.SkinViewer) {
+                    skinViewer.dispose();
+                }
+                skinViewer = new skinview3d.SkinViewer({
+                canvas: document.getElementById("skin_container"),
+                width: 350,
+                height: 450,
+                skin: "/[[SKINURL]]",
+                cape: "/[[CAPEURL]]",
+                model: "[[TYPE]]",
+                nameTag: "[[USERNAME]]",
+                zoom: 0.7
+            });
+            
+            walking = false;
+            running = false;
+            flying = false;
+            rotating = false;
+            elytra = false;
+		}
+	</script>
+	
+	<div id="control_panel">
+	<input type="button" value="Toggle Walk/Run/Fly" onclick="walk_toggle()"/>
+	<input type="button" value="Toggle Rotate" onclick="rotate_toggle()"/>
+    <input type="button" value="Toggle Elytra" onclick="elytra_toggle()"/>
+	<input type="button" value="Reset" onclick="InitSkinViewer()"/>
+	</div>
+  </body>
+</html>

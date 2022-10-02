@@ -2,6 +2,11 @@
   <head>
     <title>Minecraft Skins!</title>
     <style>
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('static/minecraft.woff2') format('woff2');
+        }
+
         body{
             background-color: #000000;
         }
@@ -52,11 +57,11 @@
   <span>Welcome, [[USERNAME]]</span>
   <input type="button" value="Logout" onclick='var cookies = document.cookie.split(";");for (var i = 0; i < cookies.length; i++) {var cookie = cookies[i];var eqPos = cookie.indexOf("=");var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";}location.reload();'/>
   </div>
-    <div id="skin_container"></div>
+    <canvas id="skin_container"></canvas>
     
-	<script type="text/javascript" src="static/three.min.js"></script>
+	<!-- <script type="text/javascript" src="static/three.min.js"></script> -->
 
-	<script type="text/javascript" src="static/skinview3d.min.js"></script>
+	<script src="static/skinview3d.bundle.js"></script>
 
 	<script>
 	
@@ -65,60 +70,71 @@
         onload = InitSkinViewer();
         
 		function walk_toggle(){
-            if (!walking){
-                if (running){run.remove();}
-                walk = skinViewer.animation.add(skinview3d.WalkingAnimation);
-                walk.speed = 1.5;
-                walking = true;
-                running = false;
-            }
-            else{
-                if (walking){walk.remove();}
-                run = skinViewer.animation.add(skinview3d.RunningAnimation);
-                run.speed = 1;
+            // Walk -> Run -> Fly -> Walk -> ...
+
+            if (walking){
+                skinViewer.animation = new skinview3d.RunningAnimation();
                 walking = false;
                 running = true;
+            }
+            else if (running){
+                skinViewer.animation = new skinview3d.FlyingAnimation();
+                running = false;
+                flying = true;
+            } else {
+                skinViewer.animation = new skinview3d.WalkingAnimation();
+                flying = false;
+                walking = true;
             }
 		}
 		
 		function rotate_toggle(){
             if (!rotating){
-                rotate = skinViewer.animation.add(skinview3d.RotatingAnimation);
-                rotate.speed = 1;
+                skinViewer.autoRotate = true;
                 rotating = true;
             }else{
-                rotate.remove();
+                skinViewer.autoRotate = false;
                 rotating = false;
             }
 		}
+
+        function elytra_toggle(){
+            if (!elytra) {
+                skinViewer.playerObject.backEquipment = "elytra";
+                elytra = true;
+            } else {
+                skinViewer.playerObject.backEquipment = "cape";
+                elytra = false;
+            }
+        }
 		
 		function InitSkinViewer(){
                 if (skinViewer instanceof skinview3d.SkinViewer) {
                     skinViewer.dispose();
-                    control = undefined;
                 }
                 skinViewer = new skinview3d.SkinViewer({
-                domElement: document.getElementById("skin_container"),
+                canvas: document.getElementById("skin_container"),
                 width: 350,
                 height: 450,
-                skinUrl: "[[SKINURL]]",
-                capeUrl: "[[CAPEURL]]"
+                skin: "[[SKINURL]]",
+                cape: "[[CAPEURL]]",
+                model: "[[TYPE]]",
+                nameTag: "[[USERNAME]]",
+                zoom: 0.7
             });
-            // By default, the skin model is automatically detected. You can turn it off in this way:
-            // skinViewer.detectModel = false;
-            // skinViewer.playerObject.skin.slim = true;
-            control = new skinview3d.createOrbitControls(skinViewer);
-            skinViewer.animation = new skinview3d.CompositeAnimation();
             
             walking = false;
             running = false;
+            flying = false;
             rotating = false;
+            elytra = false;
 		}
 	</script>
 	
 	<div id="control_panel">
-	<input type="button" value="Toggle Walk/Run" onclick="walk_toggle()"/>
+	<input type="button" value="Toggle Walk/Run/Fly" onclick="walk_toggle()"/>
 	<input type="button" value="Toggle Rotate" onclick="rotate_toggle()"/>
+    <input type="button" value="Toggle Elytra" onclick="elytra_toggle()"/>
 	<input type="button" value="Reset" onclick="InitSkinViewer()"/>
 	</div>
 	<div class="skin_form">
